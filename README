@@ -6,7 +6,46 @@ client to hbase 0.2x.
 I packaged this up cause it's a pain in the ass scping
 all this crap over a couple different machines.
 
-INSTALL:
+
+-------------------------------
+    INSTALLING
+-------------------------------
+
+HBASE:
+----------
+git clone http://git.apache.org/hbase.git/
+cd hbase; ant
+
+THRIFT:
+----------
+ensure you have all the required libraries
+for this:
+
+sudo apt-get install autoconf libtool libboost-dev
+  flex bison pkg-config libevent-dev ruby-dev zlib1g-dev
+
+wget -O thrift.tgz "http://gitweb.thrift-rpc.org/?p=thrift.git;a=snapshot;h=HEAD;sf=tgz"
+tar -xzf thrift.tgz
+cd thrift; ./bootstrap.sh; ./configure; make; sudo make install
+
+gem install mongrel echoe --no-ri --no-rdoc
+cd ~/thrift/lib/rb
+rake gem
+sudo gem install pkg/thrift-0.1.0.gem --no-ri --no-rdoc
+
+HRB:
 -----------
 gem build hrb.gemspec
 sudo gem install hrb --no-ri --no-rdoc
+
+
+-------------------------------
+    RUNNING
+-------------------------------
+
+-------------------------------
+    RE-GENERATING HRB from a newer release
+-------------------------------
+mkdir ~/hrb
+thrift --gen rb -o ~/hrb /opt/hbase2/srv/java/org/apache/hadoop/hbase/thrift/Hbase.thrift
+
