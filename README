@@ -1,0 +1,12 @@
+What is this?
+---------------
+This is the latest (as of this writing) ruby thrift
+client to hbase 0.2x.
+
+I packaged this up cause it's a pain in the ass scping
+all this crap over a couple different machines.
+
+INSTALL:
+-----------
+gem build hrb.gemspec
+sudo gem install hrb --no-ri --no-rdoc
