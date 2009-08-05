@@ -22,7 +22,13 @@ ensure you have all the required libraries
 for this:
 
 sudo apt-get install autoconf libtool libboost-dev
-  flex bison pkg-config libevent-dev ruby-dev zlib1g-dev
+  g++ sun-java6-jdk ant flex bison pkg-config libevent-dev ruby-dev zlib1g-dev
+
+NOTE:
+  if you are using the latest jaunty jackalope on ubuntu
+make a symlink like so: (looks like ubuntu is seperating our packages
+once again)
+  sudo ln -s /usr/include/boost/ /usr/local/include/boost-1_34_1
 
 wget -O thrift.tgz "http://gitweb.thrift-rpc.org/?p=thrift.git;a=snapshot;h=HEAD;sf=tgz"
 tar -xzf thrift.tgz
