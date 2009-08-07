@@ -12,8 +12,8 @@ hrb:
   this is the native thrift bindings to access hbase
 
 hrb-ng:
-  this is the same thing but with a patch that allows
-communication to a patched thrift server
+  this is the same thing but with a set of patches
+that allow you to issue scans with start/stop rows
 
 -------------------------------
     INSTALLING
@@ -22,6 +22,7 @@ communication to a patched thrift server
 HBASE:
 ----------
 git clone http://git.apache.org/hbase.git/
+exportexport JAVA_HOME=/usr/lib/jvm/java-6-sun-1.6.0.14/jre/
 cd hbase; ant
 
 THRIFT:
@@ -52,10 +53,24 @@ HRB:
 gem build hrb.gemspec
 sudo gem install hrb --no-ri --no-rdoc
 
+HRB-NG:
+-----------
+gem build hrb-ng.gemspec
+sudo gem install hrb-ng --no-ri --no-rdoc
 
 -------------------------------
     RUNNING
 -------------------------------
+require 'rubygems'
+require 'hrb-ng'
+
+transport = Thrift::BufferedTransport.new(Thrift::Socket.new('127.0.0.1', 9090))
+protocol = Thrift::BinaryProtocol.new(transport)
+HBASE = Apache::Hadoop::Hbase::Client.new(protocol)
+transport.open()
+
+scanner = HBASE.scannerOpenWithStopStartTs("mytable", "myrow.0", "myrow.1",
+["mycol:"], 1249677001723, 1249677009731)
 
 -------------------------------
     RE-GENERATING HRB from a newer release

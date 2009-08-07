@@ -1,0 +1,1001 @@
+--- Hbase.java	2009-08-07 15:39:49.000000000 -0500
++++ Hbase.java.orig	2009-08-07 15:40:36.000000000 -0500
+@@ -459,34 +459,6 @@
+      * @param startRow
+      * @param stopRow
+      * @param columns
+-     * @param startTimestamp
+-     * @param stopTimestamp
+-     */
+-    public int scannerOpenWithStopStartTs(byte[] tableName, byte[] startRow, byte[] stopRow, List<byte[]> columns, long startTimestamp, long stopTimestamp) throws IOError, TException;
+-
+-
+-    /**
+-     * Get a scanner on the current table starting and stopping at the
+-     * specified rows.  ending at the last row in the table.  Return the
+-     * specified columns.  Only values with the specified timestamp are
+-     * returned.
+-     * 
+-     * @param columns columns to scan. If column name is a column family, all
+-     * columns of the specified column family are returned.  Its also possible
+-     * to pass a regex in the column qualifier.
+-     * @param tableName name of table
+-     * @param startRow starting row in table to scan.  send "" (empty string) to
+-     *                 start at the first row.
+-     * @param stopRow row to stop scanning on.  This row is *not* included
+-     *                in the scanner's results
+-     * @param timestamp timestamp
+-     * 
+-     * @return scanner id to be used with other scanner procedures
+-     * 
+-     * @param tableName
+-     * @param startRow
+-     * @param stopRow
+-     * @param columns
+      * @param timestamp
+      */
+     public int scannerOpenWithStopTs(byte[] tableName, byte[] startRow, byte[] stopRow, List<byte[]> columns, long timestamp) throws IOError, TException;
+@@ -1667,48 +1639,6 @@
+       throw new TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenTs failed: unknown result");
+     }
+ 
+-    public int scannerOpenWithStopStartTs(byte[] tableName, byte[] startRow, byte[] stopRow, List<byte[]> columns, long startTimestamp, long stopTimestamp) throws IOError, TException
+-    {
+-      send_scannerOpenWithStopStartTs(tableName, startRow, stopRow, columns, startTimestamp, stopTimestamp);
+-      return recv_scannerOpenWithStopStartTs();
+-    }
+-
+-    public void send_scannerOpenWithStopStartTs(byte[] tableName, byte[] startRow, byte[] stopRow, List<byte[]> columns, long startTimestamp, long stopTimestamp) throws TException
+-    {
+-      oprot_.writeMessageBegin(new TMessage("scannerOpenWithStopStartTs", TMessageType.CALL, seqid_));
+-      scannerOpenWithStopStartTs_args args = new scannerOpenWithStopStartTs_args();
+-      args.tableName = tableName;
+-      args.startRow = startRow;
+-      args.stopRow = stopRow;
+-      args.columns = columns;
+-      args.startTimestamp = startTimestamp;
+-      args.stopTimestamp = stopTimestamp;
+-      args.write(oprot_);
+-      oprot_.writeMessageEnd();
+-      oprot_.getTransport().flush();
+-    }
+-
+-    public int recv_scannerOpenWithStopStartTs() throws IOError, TException
+-    {
+-      TMessage msg = iprot_.readMessageBegin();
+-      if (msg.type == TMessageType.EXCEPTION) {
+-        TApplicationException x = TApplicationException.read(iprot_);
+-        iprot_.readMessageEnd();
+-        throw x;
+-      }
+-      scannerOpenWithStopStartTs_result result = new scannerOpenWithStopStartTs_result();
+-      result.read(iprot_);
+-      iprot_.readMessageEnd();
+-      if (result.isSetSuccess()) {
+-        return result.success;
+-      }
+-      if (result.io != null) {
+-        throw result.io;
+-      }
+-      throw new TApplicationException(TApplicationException.MISSING_RESULT, "scannerOpenWithStopStartTs failed: unknown result");
+-    }
+-
+-
+     public int scannerOpenWithStopTs(byte[] tableName, byte[] startRow, byte[] stopRow, List<byte[]> columns, long timestamp) throws IOError, TException
+     {
+       send_scannerOpenWithStopTs(tableName, startRow, stopRow, columns, timestamp);
+@@ -1900,7 +1830,6 @@
+       processMap_.put("scannerOpenWithPrefix", new scannerOpenWithPrefix());
+       processMap_.put("scannerOpenTs", new scannerOpenTs());
+       processMap_.put("scannerOpenWithStopTs", new scannerOpenWithStopTs());
+-      processMap_.put("scannerOpenWithStopStartTs", new scannerOpenWithStopStartTs());
+       processMap_.put("scannerGet", new scannerGet());
+       processMap_.put("scannerGetList", new scannerGetList());
+       processMap_.put("scannerClose", new scannerClose());
+@@ -2551,27 +2480,6 @@
+ 
+     }
+ 
+-    private class scannerOpenWithStopStartTs implements ProcessFunction {
+-      public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+-      {
+-        scannerOpenWithStopStartTs_args args = new scannerOpenWithStopStartTs_args();
+-        args.read(iprot);
+-        iprot.readMessageEnd();
+-        scannerOpenWithStopStartTs_result result = new scannerOpenWithStopStartTs_result();
+-        try {
+-          result.success = iface_.scannerOpenWithStopStartTs(args.tableName, args.startRow, args.stopRow, args.columns, args.startTimestamp, args.stopTimestamp);
+-          result.__isset.success = true;
+-        } catch (IOError io) {
+-          result.io = io;
+-        }
+-        oprot.writeMessageBegin(new TMessage("scannerOpenWithStopStartTs", TMessageType.REPLY, seqid));
+-        result.write(oprot);
+-        oprot.writeMessageEnd();
+-        oprot.getTransport().flush();
+-      }
+-
+-    }
+-
+     private class scannerOpenWithStopTs implements ProcessFunction {
+       public void process(int seqid, TProtocol iprot, TProtocol oprot) throws TException
+       {
+@@ -20456,878 +20364,6 @@
+ 
+   }
+ 
+-  public static class scannerOpenWithStopStartTs_args implements TBase, java.io.Serializable, Cloneable   {
+-    private static final TStruct STRUCT_DESC = new TStruct("scannerOpenWithStopStartTs_args");
+-    private static final TField TABLE_NAME_FIELD_DESC = new TField("tableName", TType.STRING, (short)1);
+-    private static final TField START_ROW_FIELD_DESC = new TField("startRow", TType.STRING, (short)2);
+-    private static final TField STOP_ROW_FIELD_DESC = new TField("stopRow", TType.STRING, (short)3);
+-    private static final TField COLUMNS_FIELD_DESC = new TField("columns", TType.LIST, (short)4);
+-    private static final TField STARTTIMESTAMP_FIELD_DESC = new TField("startTimestamp", TType.I64, (short)5);
+-    private static final TField STOPTIMESTAMP_FIELD_DESC = new TField("stopTimestamp", TType.I64, (short)6);
+-
+-
+-    public byte[] tableName;
+-    public static final int TABLENAME = 1;
+-    public byte[] startRow;
+-    public static final int STARTROW = 2;
+-    public byte[] stopRow;
+-    public static final int STOPROW = 3;
+-    public List<byte[]> columns;
+-    public static final int COLUMNS = 4;
+-    public long startTimestamp;
+-    public static final int STARTTIMESTAMP = 5;
+-    public long stopTimestamp;
+-    public static final int STOPTIMESTAMP = 6;
+-
+-
+-    private final Isset __isset = new Isset();
+-    private static final class Isset implements java.io.Serializable {
+-      public boolean startTimestamp = false;
+-      public boolean stopTimestamp = false;
+-    }
+-
+-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
+-      put(TABLENAME, new FieldMetaData("tableName", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.STRING)));
+-      put(STARTROW, new FieldMetaData("startRow", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.STRING)));
+-      put(STOPROW, new FieldMetaData("stopRow", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.STRING)));
+-      put(COLUMNS, new FieldMetaData("columns", TFieldRequirementType.DEFAULT, 
+-          new ListMetaData(TType.LIST, 
+-              new FieldValueMetaData(TType.STRING))));
+-      put(STARTTIMESTAMP, new FieldMetaData("startTimestamp", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.I64)));
+-      put(STOPTIMESTAMP, new FieldMetaData("stopTimestamp", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.I64)));
+-    }});
+-
+-    static {
+-      FieldMetaData.addStructMetaDataMap(scannerOpenWithStopStartTs_args.class, metaDataMap);
+-    }
+-
+-    public scannerOpenWithStopStartTs_args() {
+-    }
+-
+-    public scannerOpenWithStopStartTs_args(
+-      byte[] tableName,
+-      byte[] startRow,
+-      byte[] stopRow,
+-      List<byte[]> columns,
+-      long startTimestamp,
+-      long stopTimestamp)
+-    {
+-      this();
+-      this.tableName = tableName;
+-      this.startRow = startRow;
+-      this.stopRow = stopRow;
+-      this.columns = columns;
+-      this.startTimestamp = startTimestamp;
+-      this.stopTimestamp = stopTimestamp;
+-      this.__isset.startTimestamp = true;
+-      this.__isset.stopTimestamp = true;
+-    }
+-
+-    /**
+-     * Performs a deep copy on <i>other</i>.
+-     */
+-    public scannerOpenWithStopStartTs_args(scannerOpenWithStopStartTs_args other) {
+-      if (other.isSetTableName()) {
+-        this.tableName = other.tableName;
+-      }
+-      if (other.isSetStartRow()) {
+-        this.startRow = other.startRow;
+-      }
+-      if (other.isSetStopRow()) {
+-        this.stopRow = other.stopRow;
+-      }
+-      if (other.isSetColumns()) {
+-        List<byte[]> __this__columns = new ArrayList<byte[]>();
+-        for (byte[] other_element : other.columns) {
+-          __this__columns.add(other_element);
+-        }
+-        this.columns = __this__columns;
+-      }
+-      __isset.startTimestamp = other.__isset.startTimestamp;
+-      this.startTimestamp = other.startTimestamp;
+- 
+-      __isset.stopTimestamp = other.__isset.stopTimestamp;
+-      this.stopTimestamp = other.stopTimestamp;
+-    }
+-
+-    @Override
+-    public scannerOpenWithStopStartTs_args clone() {
+-      return new scannerOpenWithStopStartTs_args(this);
+-    }
+-
+-    public byte[] getTableName() {
+-      return this.tableName;
+-    }
+-
+-    public void setTableName(byte[] tableName) {
+-      this.tableName = tableName;
+-    }
+-
+-    public void unsetTableName() {
+-      this.tableName = null;
+-    }
+-
+-    // Returns true if field tableName is set (has been asigned a value) and false otherwise
+-    public boolean isSetTableName() {
+-      return this.tableName != null;
+-    }
+-
+-    public void setTableNameIsSet(boolean value) {
+-      if (!value) {
+-        this.tableName = null;
+-      }
+-    }
+-
+-    public byte[] getStartRow() {
+-      return this.startRow;
+-    }
+-
+-    public void setStartRow(byte[] startRow) {
+-      this.startRow = startRow;
+-    }
+-
+-    public void unsetStartRow() {
+-      this.startRow = null;
+-    }
+-
+-    // Returns true if field startRow is set (has been asigned a value) and false otherwise
+-    public boolean isSetStartRow() {
+-      return this.startRow != null;
+-    }
+-
+-    public void setStartRowIsSet(boolean value) {
+-      if (!value) {
+-        this.startRow = null;
+-      }
+-    }
+-
+-    public byte[] getStopRow() {
+-      return this.stopRow;
+-    }
+-
+-    public void setStopRow(byte[] stopRow) {
+-      this.stopRow = stopRow;
+-    }
+-
+-    public void unsetStopRow() {
+-      this.stopRow = null;
+-    }
+-
+-    // Returns true if field stopRow is set (has been asigned a value) and false otherwise
+-    public boolean isSetStopRow() {
+-      return this.stopRow != null;
+-    }
+-
+-    public void setStopRowIsSet(boolean value) {
+-      if (!value) {
+-        this.stopRow = null;
+-      }
+-    }
+-
+-    public int getColumnsSize() {
+-      return (this.columns == null) ? 0 : this.columns.size();
+-    }
+-
+-    public java.util.Iterator<byte[]> getColumnsIterator() {
+-      return (this.columns == null) ? null : this.columns.iterator();
+-    }
+-
+-    public void addToColumns(byte[] elem) {
+-      if (this.columns == null) {
+-        this.columns = new ArrayList<byte[]>();
+-      }
+-      this.columns.add(elem);
+-    }
+-
+-    public List<byte[]> getColumns() {
+-      return this.columns;
+-    }
+-
+-    public void setColumns(List<byte[]> columns) {
+-      this.columns = columns;
+-    }
+-
+-    public void unsetColumns() {
+-      this.columns = null;
+-    }
+-
+-    // Returns true if field columns is set (has been asigned a value) and false otherwise
+-    public boolean isSetColumns() {
+-      return this.columns != null;
+-    }
+-
+-    public void setColumnsIsSet(boolean value) {
+-      if (!value) {
+-        this.columns = null;
+-      }
+-    }
+-
+-    public long getStartTimestamp() {
+-      return this.startTimestamp;
+-    }
+-
+-    public void setStartTimestamp(long startTimestamp) {
+-      this.startTimestamp = startTimestamp;
+-      this.__isset.startTimestamp = true;
+-    }
+-
+-    public void unsetStartTimestamp() {
+-      this.__isset.startTimestamp = false;
+-    }
+-
+-    // Returns true if field timestamp is set (has been asigned a value) and false otherwise
+-    public boolean isSetStartTimestamp() {
+-      return this.__isset.startTimestamp;
+-    }
+-
+-    public void setStartTimestampIsSet(boolean value) {
+-      this.__isset.startTimestamp = value;
+-    }
+-
+-    public long getStopTimestamp() {
+-      return this.stopTimestamp;
+-    }
+-
+-    public void setStopTimestamp(long stopTimestamp) {
+-      this.stopTimestamp = stopTimestamp;
+-      this.__isset.stopTimestamp = true;
+-    }
+-
+-    public void unsetStopTimestamp() {
+-      this.__isset.stopTimestamp = false;
+-    }
+-
+-    // Returns true if field timestamp is set (has been asigned a value) and false otherwise
+-    public boolean isSetStopTimestamp() {
+-      return this.__isset.stopTimestamp;
+-    }
+-
+-    public void setStopTimestampIsSet(boolean value) {
+-      this.__isset.stopTimestamp = value;
+-    }
+-
+-    public void setFieldValue(int fieldID, Object value) {
+-      switch (fieldID) {
+-      case TABLENAME:
+-        if (value == null) {
+-          unsetTableName();
+-        } else {
+-          setTableName((byte[])value);
+-        }
+-        break;
+-
+-      case STARTROW:
+-        if (value == null) {
+-          unsetStartRow();
+-        } else {
+-          setStartRow((byte[])value);
+-        }
+-        break;
+-
+-      case STOPROW:
+-        if (value == null) {
+-          unsetStopRow();
+-        } else {
+-          setStopRow((byte[])value);
+-        }
+-        break;
+-
+-      case COLUMNS:
+-        if (value == null) {
+-          unsetColumns();
+-        } else {
+-          setColumns((List<byte[]>)value);
+-        }
+-        break;
+-
+-      case STARTTIMESTAMP:
+-        if (value == null) {
+-          unsetStartTimestamp();
+-        } else {
+-          setStartTimestamp((Long)value);
+-        }
+-        break;
+-
+-      case STOPTIMESTAMP:
+-        if (value == null) {
+-          unsetStopTimestamp();
+-        } else {
+-          setStopTimestamp((Long)value);
+-        }
+-        break;
+-
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    public Object getFieldValue(int fieldID) {
+-      switch (fieldID) {
+-      case TABLENAME:
+-        return getTableName();
+-
+-      case STARTROW:
+-        return getStartRow();
+-
+-      case STOPROW:
+-        return getStopRow();
+-
+-      case COLUMNS:
+-        return getColumns();
+-
+-      case STARTTIMESTAMP:
+-        return new Long(getStartTimestamp());
+-
+-      case STOPTIMESTAMP:
+-        return new Long(getStopTimestamp());
+-
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
+-    public boolean isSet(int fieldID) {
+-      switch (fieldID) {
+-      case TABLENAME:
+-        return isSetTableName();
+-      case STARTROW:
+-        return isSetStartRow();
+-      case STOPROW:
+-        return isSetStopRow();
+-      case COLUMNS:
+-        return isSetColumns();
+-      case STARTTIMESTAMP:
+-        return isSetStartTimestamp();
+-      case STOPTIMESTAMP:
+-        return isSetStopTimestamp();
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    @Override
+-    public boolean equals(Object that) {
+-      if (that == null)
+-        return false;
+-      if (that instanceof scannerOpenWithStopStartTs_args)
+-        return this.equals((scannerOpenWithStopStartTs_args)that);
+-      return false;
+-    }
+-
+-    public boolean equals(scannerOpenWithStopStartTs_args that) {
+-      if (that == null)
+-        return false;
+-
+-      boolean this_present_tableName = true && this.isSetTableName();
+-      boolean that_present_tableName = true && that.isSetTableName();
+-      if (this_present_tableName || that_present_tableName) {
+-        if (!(this_present_tableName && that_present_tableName))
+-          return false;
+-        if (!java.util.Arrays.equals(this.tableName, that.tableName))
+-          return false;
+-      }
+-
+-      boolean this_present_startRow = true && this.isSetStartRow();
+-      boolean that_present_startRow = true && that.isSetStartRow();
+-      if (this_present_startRow || that_present_startRow) {
+-        if (!(this_present_startRow && that_present_startRow))
+-          return false;
+-        if (!java.util.Arrays.equals(this.startRow, that.startRow))
+-          return false;
+-      }
+-
+-      boolean this_present_stopRow = true && this.isSetStopRow();
+-      boolean that_present_stopRow = true && that.isSetStopRow();
+-      if (this_present_stopRow || that_present_stopRow) {
+-        if (!(this_present_stopRow && that_present_stopRow))
+-          return false;
+-        if (!java.util.Arrays.equals(this.stopRow, that.stopRow))
+-          return false;
+-      }
+-
+-      boolean this_present_columns = true && this.isSetColumns();
+-      boolean that_present_columns = true && that.isSetColumns();
+-      if (this_present_columns || that_present_columns) {
+-        if (!(this_present_columns && that_present_columns))
+-          return false;
+-        if (!this.columns.equals(that.columns))
+-          return false;
+-      }
+-
+-      boolean this_present_startTimestamp = true;
+-      boolean that_present_startTimestamp = true;
+-      if (this_present_startTimestamp || that_present_startTimestamp) {
+-        if (!(this_present_startTimestamp && that_present_startTimestamp))
+-          return false;
+-        if (this.startTimestamp != that.startTimestamp)
+-          return false;
+-      }
+-
+-      boolean this_present_stopTimestamp = true;
+-      boolean that_present_stopTimestamp = true;
+-      if (this_present_stopTimestamp || that_present_stopTimestamp) {
+-        if (!(this_present_stopTimestamp && that_present_stopTimestamp))
+-          return false;
+-        if (this.stopTimestamp != that.stopTimestamp)
+-          return false;
+-      }
+-
+-      return true;
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-      return 0;
+-    }
+-
+-    public void read(TProtocol iprot) throws TException {
+-      TField field;
+-      iprot.readStructBegin();
+-      while (true)
+-      {
+-        field = iprot.readFieldBegin();
+-        if (field.type == TType.STOP) { 
+-          break;
+-        }
+-        switch (field.id)
+-        {
+-          case TABLENAME:
+-            if (field.type == TType.STRING) {
+-              this.tableName = iprot.readBinary();
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case STARTROW:
+-            if (field.type == TType.STRING) {
+-              this.startRow = iprot.readBinary();
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case STOPROW:
+-            if (field.type == TType.STRING) {
+-              this.stopRow = iprot.readBinary();
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case COLUMNS:
+-            if (field.type == TType.LIST) {
+-              {
+-                TList _list94 = iprot.readListBegin();
+-                this.columns = new ArrayList<byte[]>(_list94.size);
+-                for (int _i95 = 0; _i95 < _list94.size; ++_i95)
+-                {
+-                  byte[] _elem96;
+-                  _elem96 = iprot.readBinary();
+-                  this.columns.add(_elem96);
+-                }
+-                iprot.readListEnd();
+-              }
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case STARTTIMESTAMP:
+-            if (field.type == TType.I64) {
+-              this.startTimestamp = iprot.readI64();
+-              this.__isset.startTimestamp = true;
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case STOPTIMESTAMP:
+-            if (field.type == TType.I64) {
+-              this.stopTimestamp = iprot.readI64();
+-              this.__isset.stopTimestamp = true;
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          default:
+-            TProtocolUtil.skip(iprot, field.type);
+-            break;
+-        }
+-        iprot.readFieldEnd();
+-      }
+-      iprot.readStructEnd();
+-
+-
+-      // check for required fields of primitive type, which can't be checked in the validate method
+-      validate();
+-    }
+-
+-    public void write(TProtocol oprot) throws TException {
+-      validate();
+-
+-      oprot.writeStructBegin(STRUCT_DESC);
+-      if (this.tableName != null) {
+-        oprot.writeFieldBegin(TABLE_NAME_FIELD_DESC);
+-        oprot.writeBinary(this.tableName);
+-        oprot.writeFieldEnd();
+-      }
+-      if (this.startRow != null) {
+-        oprot.writeFieldBegin(START_ROW_FIELD_DESC);
+-        oprot.writeBinary(this.startRow);
+-        oprot.writeFieldEnd();
+-      }
+-      if (this.stopRow != null) {
+-        oprot.writeFieldBegin(STOP_ROW_FIELD_DESC);
+-        oprot.writeBinary(this.stopRow);
+-        oprot.writeFieldEnd();
+-      }
+-      if (this.columns != null) {
+-        oprot.writeFieldBegin(COLUMNS_FIELD_DESC);
+-        {
+-          oprot.writeListBegin(new TList(TType.STRING, this.columns.size()));
+-          for (byte[] _iter97 : this.columns)          {
+-            oprot.writeBinary(_iter97);
+-          }
+-          oprot.writeListEnd();
+-        }
+-        oprot.writeFieldEnd();
+-      }
+-      oprot.writeFieldBegin(STARTTIMESTAMP_FIELD_DESC);
+-      oprot.writeI64(this.startTimestamp);
+-      oprot.writeFieldBegin(STOPTIMESTAMP_FIELD_DESC);
+-      oprot.writeI64(this.stopTimestamp);
+-      oprot.writeFieldEnd();
+-      oprot.writeFieldStop();
+-      oprot.writeStructEnd();
+-    }
+-
+-    @Override
+-    public String toString() {
+-      StringBuilder sb = new StringBuilder("scannerOpenWithStopStartTs_args(");
+-      boolean first = true;
+-
+-      sb.append("tableName:");
+-      if (this.tableName == null) {
+-        sb.append("null");
+-      } else {
+-        sb.append(this.tableName);
+-      }
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("startRow:");
+-      if (this.startRow == null) {
+-        sb.append("null");
+-      } else {
+-        sb.append(this.startRow);
+-      }
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("stopRow:");
+-      if (this.stopRow == null) {
+-        sb.append("null");
+-      } else {
+-        sb.append(this.stopRow);
+-      }
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("columns:");
+-      if (this.columns == null) {
+-        sb.append("null");
+-      } else {
+-        sb.append(this.columns);
+-      }
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("startTimestamp:");
+-      sb.append(this.startTimestamp);
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("stopTimestamp:");
+-      sb.append(this.stopTimestamp);
+-      first = false;
+-      sb.append(")");
+-      return sb.toString();
+-    }
+-
+-    public void validate() throws TException {
+-      // check for required fields
+-      // check that fields of type enum have valid values
+-    }
+-
+-  }
+-
+-  public static class scannerOpenWithStopStartTs_result implements TBase, java.io.Serializable, Cloneable   {
+-    private static final TStruct STRUCT_DESC = new TStruct("scannerOpenWithStopstartTs_result");
+-    private static final TField SUCCESS_FIELD_DESC = new TField("success", TType.I32, (short)0);
+-    private static final TField IO_FIELD_DESC = new TField("io", TType.STRUCT, (short)1);
+-
+-    public int success;
+-    public static final int SUCCESS = 0;
+-    public IOError io;
+-    public static final int IO = 1;
+-
+-    private final Isset __isset = new Isset();
+-    private static final class Isset implements java.io.Serializable {
+-      public boolean success = false;
+-    }
+-
+-    public static final Map<Integer, FieldMetaData> metaDataMap = Collections.unmodifiableMap(new HashMap<Integer, FieldMetaData>() {{
+-      put(SUCCESS, new FieldMetaData("success", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.I32)));
+-      put(IO, new FieldMetaData("io", TFieldRequirementType.DEFAULT, 
+-          new FieldValueMetaData(TType.STRUCT)));
+-    }});
+-
+-    static {
+-      FieldMetaData.addStructMetaDataMap(scannerOpenWithStopStartTs_result.class, metaDataMap);
+-    }
+-
+-    public scannerOpenWithStopStartTs_result() {
+-    }
+-
+-    public scannerOpenWithStopStartTs_result(
+-      int success,
+-      IOError io)
+-    {
+-      this();
+-      this.success = success;
+-      this.__isset.success = true;
+-      this.io = io;
+-    }
+-
+-    /**
+-     * Performs a deep copy on <i>other</i>.
+-     */
+-    public scannerOpenWithStopStartTs_result(scannerOpenWithStopStartTs_result other) {
+-      __isset.success = other.__isset.success;
+-      this.success = other.success;
+-      if (other.isSetIo()) {
+-        this.io = new IOError(other.io);
+-      }
+-    }
+-
+-    @Override
+-    public scannerOpenWithStopStartTs_result clone() {
+-      return new scannerOpenWithStopStartTs_result(this);
+-    }
+-
+-    public int getSuccess() {
+-      return this.success;
+-    }
+-
+-    public void setSuccess(int success) {
+-      this.success = success;
+-      this.__isset.success = true;
+-    }
+-
+-    public void unsetSuccess() {
+-      this.__isset.success = false;
+-    }
+-
+-    // Returns true if field success is set (has been asigned a value) and false otherwise
+-    public boolean isSetSuccess() {
+-      return this.__isset.success;
+-    }
+-
+-    public void setSuccessIsSet(boolean value) {
+-      this.__isset.success = value;
+-    }
+-
+-    public IOError getIo() {
+-      return this.io;
+-    }
+-
+-    public void setIo(IOError io) {
+-      this.io = io;
+-    }
+-
+-    public void unsetIo() {
+-      this.io = null;
+-    }
+-
+-    // Returns true if field io is set (has been asigned a value) and false otherwise
+-    public boolean isSetIo() {
+-      return this.io != null;
+-    }
+-
+-    public void setIoIsSet(boolean value) {
+-      if (!value) {
+-        this.io = null;
+-      }
+-    }
+-
+-    public void setFieldValue(int fieldID, Object value) {
+-      switch (fieldID) {
+-      case SUCCESS:
+-        if (value == null) {
+-          unsetSuccess();
+-        } else {
+-          setSuccess((Integer)value);
+-        }
+-        break;
+-
+-      case IO:
+-        if (value == null) {
+-          unsetIo();
+-        } else {
+-          setIo((IOError)value);
+-        }
+-        break;
+-
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    public Object getFieldValue(int fieldID) {
+-      switch (fieldID) {
+-      case SUCCESS:
+-        return new Integer(getSuccess());
+-
+-      case IO:
+-        return getIo();
+-
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    // Returns true if field corresponding to fieldID is set (has been asigned a value) and false otherwise
+-    public boolean isSet(int fieldID) {
+-      switch (fieldID) {
+-      case SUCCESS:
+-        return isSetSuccess();
+-      case IO:
+-        return isSetIo();
+-      default:
+-        throw new IllegalArgumentException("Field " + fieldID + " doesn't exist!");
+-      }
+-    }
+-
+-    @Override
+-    public boolean equals(Object that) {
+-      if (that == null)
+-        return false;
+-      if (that instanceof scannerOpenWithStopStartTs_result)
+-        return this.equals((scannerOpenWithStopStartTs_result)that);
+-      return false;
+-    }
+-
+-    public boolean equals(scannerOpenWithStopStartTs_result that) {
+-      if (that == null)
+-        return false;
+-
+-      boolean this_present_success = true;
+-      boolean that_present_success = true;
+-      if (this_present_success || that_present_success) {
+-        if (!(this_present_success && that_present_success))
+-          return false;
+-        if (this.success != that.success)
+-          return false;
+-      }
+-
+-      boolean this_present_io = true && this.isSetIo();
+-      boolean that_present_io = true && that.isSetIo();
+-      if (this_present_io || that_present_io) {
+-        if (!(this_present_io && that_present_io))
+-          return false;
+-        if (!this.io.equals(that.io))
+-          return false;
+-      }
+-
+-      return true;
+-    }
+-
+-    @Override
+-    public int hashCode() {
+-      return 0;
+-    }
+-
+-    public void read(TProtocol iprot) throws TException {
+-      TField field;
+-      iprot.readStructBegin();
+-      while (true)
+-      {
+-        field = iprot.readFieldBegin();
+-        if (field.type == TType.STOP) { 
+-          break;
+-        }
+-        switch (field.id)
+-        {
+-          case SUCCESS:
+-            if (field.type == TType.I32) {
+-              this.success = iprot.readI32();
+-              this.__isset.success = true;
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          case IO:
+-            if (field.type == TType.STRUCT) {
+-              this.io = new IOError();
+-              this.io.read(iprot);
+-            } else { 
+-              TProtocolUtil.skip(iprot, field.type);
+-            }
+-            break;
+-          default:
+-            TProtocolUtil.skip(iprot, field.type);
+-            break;
+-        }
+-        iprot.readFieldEnd();
+-      }
+-      iprot.readStructEnd();
+-
+-
+-      // check for required fields of primitive type, which can't be checked in the validate method
+-      validate();
+-    }
+-
+-    public void write(TProtocol oprot) throws TException {
+-      oprot.writeStructBegin(STRUCT_DESC);
+-
+-      if (this.isSetSuccess()) {
+-        oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
+-        oprot.writeI32(this.success);
+-        oprot.writeFieldEnd();
+-      } else if (this.isSetIo()) {
+-        oprot.writeFieldBegin(IO_FIELD_DESC);
+-        this.io.write(oprot);
+-        oprot.writeFieldEnd();
+-      }
+-      oprot.writeFieldStop();
+-      oprot.writeStructEnd();
+-    }
+-
+-    @Override
+-    public String toString() {
+-      StringBuilder sb = new StringBuilder("scannerOpenWithStopStartTs_result(");
+-      boolean first = true;
+-
+-      sb.append("success:");
+-      sb.append(this.success);
+-      first = false;
+-      if (!first) sb.append(", ");
+-      sb.append("io:");
+-      if (this.io == null) {
+-        sb.append("null");
+-      } else {
+-        sb.append(this.io);
+-      }
+-      first = false;
+-      sb.append(")");
+-      return sb.toString();
+-    }
+-
+-    public void validate() throws TException {
+-      // check for required fields
+-      // check that fields of type enum have valid values
+-    }
+-
+-  }
+-
+   public static class scannerOpenWithStopTs_args implements TBase, java.io.Serializable, Cloneable   {
+     private static final TStruct STRUCT_DESC = new TStruct("scannerOpenWithStopTs_args");
+     private static final TField TABLE_NAME_FIELD_DESC = new TField("tableName", TType.STRING, (short)1);

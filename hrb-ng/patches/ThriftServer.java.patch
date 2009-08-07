@@ -1,0 +1,29 @@
+--- ThriftServer.java	2009-08-07 15:39:39.000000000 -0500
++++ ThriftServer.java.orig	2009-08-07 15:40:12.000000000 -0500
+@@ -642,26 +642,6 @@
+         throw new IOError(e.getMessage());
+       }
+     }
+- 
+-    public int scannerOpenWithStopStartTs(byte[] tableName, byte[] startRow,
+-        byte[] stopRow, List<byte[]> columns, long startTimestamp, long stopTimestamp)
+-        throws IOError, TException {
+-      try {
+-        HTable table = getTable(tableName);
+-        byte[][] columnsArray = null;
+-        if ((columns == null) || (columns.size() == 0)) {
+-          columnsArray = getAllColumns(table);
+-        } else {
+-          columnsArray = columns.toArray(new byte[0][]);
+-        }
+-        Scan scan = new Scan(startRow, stopRow);
+-        scan.addColumns(columnsArray);
+-        scan.setTimeRange(startTimestamp, stopTimestamp);
+-        return addScanner(table.getScanner(scan));
+-      } catch (IOException e) {
+-        throw new IOError(e.getMessage());
+-      }
+-    }
+     
+     public int scannerOpenWithStopTs(byte[] tableName, byte[] startRow,
+         byte[] stopRow, List<byte[]> columns, long timestamp)

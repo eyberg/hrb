@@ -1,3 +1,20 @@
+HRB-Next Generation allows you to scan via start/end timestamps.
+
+----------------------------------------------------------------------
+Example:
+
+require 'rubygems'
+require 'hrb-ng'
+
+transport = Thrift::BufferedTransport.new(Thrift::Socket.new('127.0.0.1', 9090))
+protocol = Thrift::BinaryProtocol.new(transport)
+HBASE = Apache::Hadoop::Hbase::Client.new(protocol)
+transport.open()
+
+scanner = HBASE.scannerOpenWithStopStartTs("mytable", "myrow.0", "myrow.1", ["mycol:"], 1249677001723, 1249677009731)
+
+
+----------------------------------------------------------------------
 to apply the patch cp the patches to:
   $HBASE_HOME/src/java/org/apache/hadoop/hbase/thrift
 
