@@ -8,10 +8,10 @@ all this crap over a couple different machines.
 
 There are two DIFFERENT packages in here:
 
-hrb:
+HRB:
   this is the native thrift bindings to access hbase
 
-hrb-ng:
+HRB-NG:
   this is the same thing but with a set of patches
 that allow you to issue scans with start/stop rows
 
