@@ -3,3 +3,8 @@ to apply the patch cp the patches to:
 
 patch <ThriftServer.java.patch
 patch <Hbase.thrift.patch
+
+then apply this last one in:
+  $HBASE_HOME/src/java/org/apache/hadoop/hbase/thrift/generated
+patch <Hbase.java.patch
+
