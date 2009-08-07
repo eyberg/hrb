@@ -6,6 +6,14 @@ client to hbase 0.2x.
 I packaged this up cause it's a pain in the ass scping
 all this crap over a couple different machines.
 
+There are two DIFFERENT packages in here:
+
+hrb:
+  this is the native thrift bindings to access hbase
+
+hrb-ng:
+  this is the same thing but with a patch that allows
+communication to a patched thrift server
 
 -------------------------------
     INSTALLING
