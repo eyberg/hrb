@@ -1,0 +1,28 @@
+518,544d517
+<   ScannerID scannerOpenWithStopStartTs(1:Text tableName, 
+<                                   2:Text startRow,
+<                                   3:Text stopRow, 
+<                                   4:list<Text> columns,
+<                                   5:i64 startTimestamp
+<                                   6:i64 stopTimestamp)
+<     throws (1:IOError io)
+< 
+< 
+<   /** 
+<    * Get a scanner on the current table starting and stopping at the
+<    * specified rows.  ending at the last row in the table.  Return the
+<    * specified columns.  Only values with the specified timestamp are
+<    * returned.
+<    *
+<    * @param columns columns to scan. If column name is a column family, all
+<    * columns of the specified column family are returned.  Its also possible
+<    * to pass a regex in the column qualifier.
+<    * @param tableName name of table
+<    * @param startRow starting row in table to scan.  send "" (empty string) to
+<    *                 start at the first row.
+<    * @param stopRow row to stop scanning on.  This row is *not* included
+<    *                in the scanner's results
+<    * @param timestamp timestamp
+<    *
+<    * @return scanner id to be used with other scanner procedures
+<    */

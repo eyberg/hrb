@@ -1,0 +1,5 @@
+to apply the patch cp the patches to:
+  $HBASE_HOME/src/java/org/apache/hadoop/hbase/thrift
+
+patch <ThriftServer.java.patch
+patch <Hbase.thrift.patch
